@@ -1,0 +1,64 @@
+                                             IA-1 4403 Venkatsundhar SP
+1)
+select *
+from customerinteractions
+where month = 'March' and DataUsed > (select avg(dataused) from customerinteractions); 
+
+2)
+
+3)
+
+4)
+select producttypeid,sum(totalsalesamount) 
+from quarterlysales
+group by producttypeid having producttypeid=1;
+
+5)
+select ProductTypeID,totalsalesamount 
+from quarterlysales
+where quarter = 'q1'
+order by totalsalesamount desc limit 1;
+
+6)
+select producttypeid,sum(totalsalesamount)/sum(unitssold)
+from quarterlysales
+where producttypeid=1 and quarter='q2';
+
+7)
+select region
+from sectorenergyconsumption
+where month = 'March' and energysource in ('solar','wind')
+and consumptionkwh > (select avg(consumptionkwh) from sectorenergyconsumption); 
+
+8)
+select sector,month,sum(ConsumptionKWh)
+from sectorenergyconsumption
+group by sector,month
+order by sector,month;
+
+9)
+select energysource,consumptionkwh
+from sectorenergyconsumption
+where month = 'February'
+order by EnergySource;
+
+10)
+select customername
+from insuranceactivities
+where investigation = 'No' and 
+(Feedbackscore > (select avg(FeedbackScore) from insuranceactivities) or 
+claimscount > (select avg(claimscount) from insuranceactivities)); 
+
+11)
+select policytype,sum(AnnualPremium),avg(feedbackscore)
+where investigation = 'No'
+group by policytype
+having(claimscount > 1);
+
+12)
+select policytype,claimscount,avg(feedbackscore)
+from insuranceactivities
+group by policytype,claimscount
+order by policytype,claimscount;
+
+
