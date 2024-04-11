@@ -1,0 +1,83 @@
+                                            SQL IA-2 4403 Venkatsundhar SP
+
+1)
+select machine_id from l1_maintenance_records
+where month(maintenance_date) = 3 and cost > (select avg(cost) from l1_maintenance_records);
+
+2)
+select maintenance_type,count(maintenance_id) from l1_maintenance_records
+where month(maintenance_date) = 3
+group by maintenance_type;
+
+3)
+select technician_name,avg(cost),count(maintenance_id) from l1_maintenance_records
+where month(maintenance_date) = 3
+group by technician_name
+order by count(maintenance_id),avg(cost) desc limit 1;
+
+4)
+select avg(incident_count_pre_update-incident_count_post_update) from l2_updates;
+
+5)
+select update_id from l2_updates
+order by user_feedback_score desc limit 1;
+
+6)
+select product_id, update_id
+from l2_updates
+group by product_id,update_id
+order by incident_count_pre_update-incident_count_post_update limit 1;
+
+7)
+select p.patient_name,f.facility_name,v.reason_for_visit,t.outcome
+from l3_patients p
+join l3_visits v
+using (patient_id)
+join l3_facilities f
+using (facility_id)
+join l3_treatments t
+using (visit_id);
+
+8)
+select f.facility_name,count(v.visit_id) as Emergency_visits
+from l3_visits v
+join l3_facilities f
+using(facility_id)
+where v.reason_for_visit = 'Emergency' and month(visit_date) = 3
+group by f.facility_name;
+
+9)
+select p.insurance_provider,count(t.outcome) as Count_of_complicated
+from l3_patients p
+join l3_visits v
+using(patient_id)
+join l3_treatments t
+using(visit_id)
+where month(v.visit_date) < 4 and t.outcome = 'Complicated'
+group by p.insurance_provider
+order by Count_of_complicated;
+
+10) 
+
+11)
+create view view_sales as 
+(select st.region,sum(p.price * s.quantity*0.012) as sales
+from l4_sales s
+join l4_stores st
+using(store_id)
+join l4_products p
+using(product_id)
+group by st.region);
+select * from view_Sales;
+select region from view_sales
+order by sales desc limit 1;
+
+12)
+select * from 
+l4_sales 
+cross join l4_products
+using (product_id)
+cross join l4_stores
+using(store_id);
+
+
