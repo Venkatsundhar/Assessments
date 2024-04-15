@@ -1,0 +1,145 @@
+                                                Final Assessment 4403
+create database final;
+use final;
+-- 1
+select p.product_category,avg(s.sales_amount) as Avg_Sales
+from products p
+join sales_records s using(product_id)
+where datediff(now(),s.sales_date)<=30
+group by p.product_category;
+
+-- 2
+select p.product_id,p.product_name,sum(s.sales_amount) as Total_Sales,
+rank() over(order by sum(s.sales_amount) desc) as Sales_Ranking
+from products p
+join sales_records s using(product_id)
+group by p.product_id,p.product_name
+limit 3;
+
+-- 3
+select c.customer_id,c.customer_name,sum(s.sales_amount),
+rank() over(order by sum(s.sales_amount) desc) as Customer_Ranking,
+cume_dist() over(order by sum(s.sales_amount)) as Percentage_Contribution
+from customers c
+join sales_records s using(customer_id)
+group by c.customer_id,c.customer_name
+order by customer_ranking;
+
+-- 4
+select customer_id,count(product_id),
+case when count(product_id) >=2 then 'Consistent Buyers'
+else 'Occasional Buyers'
+end as Type_of_Buyer
+from sales_records
+group by customer_id;
+
+-- 5
+select concat(f.departure_airport,' -> ',f.arrival_airport),avg(ticket_price)
+from flights f
+join tickets t using(flight_id)
+group by concat(f.departure_airport,' -> ',f.arrival_airport);
+
+-- 6
+select f.flight_number,f.departure_date,count(t.passenger_id) as Tickets_sold
+from flights f
+join tickets t using(flight_id)
+group by f.flight_number,f.departure_date
+order by Tickets_sold desc;
+
+-- 7
+select p.passenger_name,sum(t.ticket_price) as Amnt_spent_on_Ticket,p.frequent_flyer_status
+from passengers p
+join tickets t using(passenger_id)
+group by p.passenger_name,p.frequent_flyer_status
+order by Amnt_spent_on_Ticket desc
+limit 5;
+
+-- 8
+select monthname(ticket_date) as Month,count(ticket_id) as Tickets_sold
+from tickets
+group by monthname(ticket_date)
+order by sum(ticket_price) desc
+limit 1;
+
+-- 9
+select p.player_id,p.player_name,g.game_genre,
+avg(curdate()-ps.play_date) as Avg_time_spent
+from players p
+join playerscores ps using(player_id)
+join games g using(game_id)
+group by p.player_id,p.player_name,g.game_genre
+order by Avg_time_spent desc;
+
+-- 10
+select game_id,count(player_id) as No_of_players
+from playerscores 
+group by game_id
+order by No_of_players desc
+limit 3;
+
+-- 11
+select game_id,max(score) as Top_Score,avg(score) as Avg_Score,count(player_id) as No_of_players
+from playerscores 
+group by game_id;
+
+-- 12
+select p.player_id,p.player_name,p.registration_date, ps.play_date
+from players p
+join playerscores ps
+using(player_id)
+where datediff(now(),ps.play_date) >= 30;
+
+-- 13
+select d.doctor_name,sum(t.cost) as Total_cost
+from doctors d join treatments t using(doctor_id)
+group by d.doctor_name
+order by Total_cost desc
+limit 5;
+
+-- 14
+select treatment_name,sum(cost) as Total_revenue,
+cume_dist() over(order by sum(cost)) as Percentage_contribution
+from treatments
+group by treatment_name
+order by Total_revenue desc;
+
+-- 15
+select patient_id,patient_name,admission_date,discharge_date,count(admission_date)
+from patients
+group by patient_id having (count(admission_date) > 1)
+order by admission_date;
+
+-- 16 
+select gender,diagnosis,avg(discharge_date-admission_date) as LOS
+from patients
+group by gender,diagnosis;
+
+-- 17
+select c.department,e.semester,avg(e.grade) as Avg_Grade
+from courses c join enrollments e using(course_id)
+group by c.department,e.semester
+order by c.department,e.semester;
+
+-- 18
+select s.major,count(e.student_id)
+from students s join courses c on s.major = c.department
+join enrollments e using(student_id)
+group by s.major;
+
+-- 19
+select s.student_name,sum(credits) as total_credits
+from students s 
+join courses c on s.major = c.department
+join enrollments e using(course_id)
+group by s.student_name,e.semester having (sum(credits) > 50)
+order by total_credits desc;
+
+-- 20 
+select c.course_name,s.enrollment_year,count(e.student_id)
+from students s 
+join courses c on s.major = c.department
+join enrollments e using(course_id)
+group by c.course_name,s.enrollment_year
+order by count(e.student_id) desc 
+limit 3;
+
